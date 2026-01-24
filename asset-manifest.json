@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/app-yellow-ass/static/css/main.9453a75f.css",
-    "main.js": "/app-yellow-ass/static/js/main.1efa2ce8.js",
+    "main.js": "/app-yellow-ass/static/js/main.2616cf76.js",
     "static/js/453.4fb7e39c.chunk.js": "/app-yellow-ass/static/js/453.4fb7e39c.chunk.js",
     "index.html": "/app-yellow-ass/index.html",
     "main.9453a75f.css.map": "/app-yellow-ass/static/css/main.9453a75f.css.map",
-    "main.1efa2ce8.js.map": "/app-yellow-ass/static/js/main.1efa2ce8.js.map",
+    "main.2616cf76.js.map": "/app-yellow-ass/static/js/main.2616cf76.js.map",
     "453.4fb7e39c.chunk.js.map": "/app-yellow-ass/static/js/453.4fb7e39c.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.9453a75f.css",
-    "static/js/main.1efa2ce8.js"
+    "static/js/main.2616cf76.js"
   ]
 }
