@@ -1,5 +1,5 @@
 import React, { createContext } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, HashRouter } from 'react-router-dom'
 import { CssBaseline } from '@mui/material'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 
@@ -33,7 +33,7 @@ function App() {
         <ThemeProvider theme={theme}>
             <CssBaseline />
                 <AppTreeContext.Provider value={appTree}>
-                    <Router>
+                    <HashRouter>
                         <Layout>
                             <Routes>
                                 <Route path="/" element={<Groups />} />
@@ -42,7 +42,7 @@ function App() {
                                 <Route path="/files/:versionId" element={<Files />} />
                             </Routes>
                         </Layout>
-                    </Router>
+                    </HashRouter>
                 </AppTreeContext.Provider>
         </ThemeProvider>
     )
