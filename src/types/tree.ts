@@ -1,3 +1,9 @@
+type TStatus = 'no' | 'request' | 'file'
+
+type TStatusVersion = 'request' | 'new' | 'not available' | 'complete'
+
+type TFilter = 'all' | 'file' | 'request' | 'sub'
+
 interface IAppTreeFile {
     fileId: number
     fileName: string
@@ -11,7 +17,7 @@ interface IAppTreeVersion {
     versionDate: string
     previousVersions: string[]
     minVersions: string[]
-    versionStatus: 'request' | 'new' | 'not available' | 'complete'
+    versionStatus: TStatusVersion
     files: IAppTreeFile[]
 }
 
@@ -19,6 +25,7 @@ interface IAppTreeConfig {
     [key: number]: {
         configName: string
         configLink: string | null
+        configStatus: TStatus
         versions: IAppTreeVersion[]
     }
 }
@@ -30,11 +37,9 @@ interface ISubscriptions {
 }
 
 interface IAppTree {
-    filter: string
-    subscriptions: ISubscriptions[]
-    requestVersions: number[]
     [key: number]: {
         groupName: string
+        groupStatus: TStatus
         configs: IAppTreeConfig
     }
 }
@@ -44,5 +49,6 @@ export type {
     IAppTreeVersion,
     IAppTreeConfig,
     IAppTree,
-    ISubscriptions
+    ISubscriptions,
+    TFilter
 }

@@ -7,7 +7,8 @@ import {
     TableCell,
     TableContainer, TableHead, TableRow,
     Typography,
-    Chip
+    Chip,
+    Button
 } from '@mui/material'
 import {useNavigate, useParams} from 'react-router-dom'
 import moment from 'moment'
@@ -19,7 +20,8 @@ const Versions: FC = () => {
     const { configId } = useParams()
     const navigate = useNavigate()
 
-    const appTree = useContext(AppTreeContext)
+    const app = useContext(AppTreeContext)
+    const { appTree, appSettings } = app
 
     const config = Object.values(appTree).filter(g => g.configs[Number(configId)])[0].configs[Number(configId)]
     const versions: IAppTreeVersion[] = config.versions
@@ -33,7 +35,8 @@ const Versions: FC = () => {
         if (files && files.length) navigate(`/files/${versionId}`)
     }
 
-    const getStatusColor = (status: string): { label: string, color: 'error' | 'warning' | 'success' } => {
+    const getStatusColor = (status: string, versionId: number): { label: string, color: 'error' | 'warning' | 'success' } => {
+        if (appSettings.requests.find(r => r.id === versionId)) return { label: 'уже запрошен', color: 'error' }
         if (status === 'not available') return { label: 'нет', color: 'error' }
         if (status === 'request') return { label: 'по запросу', color: 'warning' }
         return { label: 'есть', color: 'success' }
@@ -68,11 +71,16 @@ const Versions: FC = () => {
                                 <TableCell>{row.versionName}</TableCell>
                                 <TableCell sx={{ color: isFresh(row.versionDate) }}>{row.versionDate ? moment(row.versionDate).format('DD.MM.YYYY') : '-'}</TableCell>
                                 <TableCell>
-                                    <Chip
-                                        label={getStatusColor(row.versionStatus).label}
-                                        color={getStatusColor(row.versionStatus).color}
-                                        size="small"
-                                    />
+                                    {getStatusColor(row.versionStatus, row.versionId).label === 'по запросу'
+                                        ?
+                                            <Button variant="outlined" color={'warning'}>запросить</Button>
+                                        :
+                                            <Chip
+                                                label={getStatusColor(row.versionStatus, row.versionId).label}
+                                                color={getStatusColor(row.versionStatus, row.versionId).color}
+                                                size="small"
+                                            />
+                                    }
                                 </TableCell>
                             </TableRow>
                         ))}

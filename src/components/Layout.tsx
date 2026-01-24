@@ -16,39 +16,26 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { useNavigate } from 'react-router-dom'
 import {AppTreeContext} from "../App";
-import {ISubscriptions} from "../types/tree";
+import {ISubscriptions, TFilter} from "../types/tree";
 
 const Layout = ({ children }: { children: ReactNode }) => {
     const { tg, queryId, user, chat} = useTelegram()
 
-    const appTree = useContext(AppTreeContext)
+    const app = useContext(AppTreeContext)
+    const { appTree, appSettings, updateFilter } = app;
 
-    const [subscriptions, setSubscriptions] = useState<ISubscriptions[]>(appTree.subscriptions)
-    const [requestVersions, setRequestVersions] = useState<number[]>(appTree.requestVersions)
-    const [filter, setFilter] = useState<string>('1')
+    const [subscriptions, setSubscriptions] = useState<ISubscriptions[]>([])
+    const [requestVersions, setRequestVersions] = useState<number[]>([])
 
     const navigate = useNavigate()
     const location = useLocation()
-
-    useEffect(() => {
-        // Управление кнопкой "Назад" в Telegram
-        // if (window.Telegram && window.Telegram.WebApp) {
-        //     const webApp = window.Telegram.WebApp;
-        //
-        //     if (location.pathname === '/') {
-        //         webApp.BackButton.hide();
-        //     } else {
-        //         webApp.BackButton.show();
-        //     }
-        // }
-    }, [location]);
 
     const handleBack = () => {
         navigate(-1);
     };
 
     const handleChange = (event: SelectChangeEvent<string>) => {
-        setFilter(event.target.value)
+        updateFilter(event.target.value as TFilter)
     }
 
     const onSendData = useCallback(async () => {
@@ -73,6 +60,10 @@ const Layout = ({ children }: { children: ReactNode }) => {
             text: 'Отправить данные'
         })
     }, [])
+
+    useEffect(() => {
+        console.log('appTree.filter - ', appSettings.filter)
+    }, [appSettings.filter])
 
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -104,13 +95,14 @@ const Layout = ({ children }: { children: ReactNode }) => {
                             <Select
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
-                                value={filter}
+                                value={appSettings.filter}
                                 label="Фильтр"
                                 onChange={handleChange}
                             >
-                                <MenuItem value={1}>Есть файл</MenuItem>
-                                <MenuItem value={2}>Запросить</MenuItem>
-                                <MenuItem value={3}>Подписки</MenuItem>
+                                <MenuItem value={'all'}>Все</MenuItem>
+                                <MenuItem value={'file'}>Есть файл</MenuItem>
+                                <MenuItem value={'request'}>Запросить</MenuItem>
+                                <MenuItem value={'sub'}>Подписки</MenuItem>
                             </Select>
                         </FormControl>
                     </Box>

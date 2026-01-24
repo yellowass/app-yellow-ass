@@ -1,4 +1,4 @@
-import React, { FC, useContext, useState } from 'react'
+import React, { FC, useContext, useEffect, useState } from 'react'
 import {
     Box,
     IconButton,
@@ -11,9 +11,10 @@ import {
     TableRow,
     Paper,
     Tooltip
-} from "@mui/material";
+} from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import CheckIcon from '@mui/icons-material/Check'
+import AddIcon from '@mui/icons-material/Add'
 import { useNavigate, useParams } from 'react-router-dom'
 import moment from 'moment/moment'
 
@@ -25,26 +26,18 @@ interface IConfigs {
     configName: string
     configLink: string | null
     versions: IAppTreeVersion[]
+    isSub: boolean
 }
 
 const Configurations: FC = () => {
     const [copiedId, setCopiedId] = useState<number>(0)
+    const [configs, setConfigs] = useState<IConfigs[]>([])
+
     const { groupId } = useParams()
     const navigate = useNavigate()
 
-    const appTree = useContext(AppTreeContext)
-
-    const configsArray: IConfigs[] = []
-    Object.keys(appTree[Number(groupId)].configs).forEach((configId: string) => {
-        const cId = Number(configId)
-        const item = appTree[Number(groupId)].configs[cId]
-        configsArray.push({
-            configId: cId,
-            configName: item.configName,
-            configLink: item.configLink,
-            versions: item.versions
-        })
-    })
+    const app = useContext(AppTreeContext)
+    const { appSettings, appTree, updateSubscriptions } = app
 
     const handleClick = (configId: number) => {
         navigate(`/versions/${configId}`)
@@ -79,6 +72,68 @@ const Configurations: FC = () => {
         return moment().diff(moment(src), 'days') <= 7 ? 'red' : 'black'
     }
 
+    useEffect(() => {
+        const configsFilter: IConfigs[] = []
+
+        const group = appTree[Number(groupId)]
+        const { configs } = group
+        const { subscriptions } = appSettings
+        const subscriptionsSet = new Set(subscriptions);
+
+        for (const configId in configs) {
+            const cId = Number(configId);
+            const item = configs[cId];
+
+            const isSub = subscriptionsSet.has(configId);
+
+            let isFilter = false;
+
+            switch (appSettings.filter) {
+                case 'all':
+                    isFilter = true;
+                    break;
+                case 'sub':
+                    isFilter = isSub;
+                    break;
+                case 'request':
+                    isFilter = item.configStatus === 'request';
+                    break;
+                case 'file':
+                    isFilter = item.configStatus === 'file';
+                    break;
+                default:
+                    // Для 'all' или других значений
+                    isFilter = appSettings.filter === 'all' ||
+                        (appSettings.filter === 'no' && item.configStatus === 'no');
+                    break;
+            }
+
+            if (isFilter) {
+                configsFilter.push({
+                    configId: cId,
+                    configName: item.configName,
+                    configLink: item.configLink,
+                    versions: item.versions,
+                    isSub
+                });
+            }
+        }
+        setConfigs(configsFilter)
+    }, [appSettings.filter, appSettings.subscriptions])
+
+    function handleDelSub(configId: number) {
+        const currentSub = appSettings.subscriptions.filter(s => s !== String(configId))
+        updateSubscriptions(currentSub)
+    }
+
+    function handleAddSub(configId: number) {
+        if (appSettings.subscriptions.length >= 10) {
+            alert('Количество подписок не может превышать 10')
+        } else {
+            updateSubscriptions([...appSettings.subscriptions, String(configId)])
+        }
+    }
+
     return (
         <Box sx={{ p: 3 }}>
             <Typography variant="h5" gutterBottom>
@@ -93,10 +148,11 @@ const Configurations: FC = () => {
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Версия</TableCell>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Дата</TableCell>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Ссылка</TableCell>
+                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Подписка</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {configsArray.map((row) => (
+                        {configs.map((row) => (
                             <TableRow
                                 key={row.configId}
                                 hover
@@ -126,6 +182,26 @@ const Configurations: FC = () => {
                                         </Tooltip>
                                         :
                                             '-'
+                                    }
+                                </TableCell>
+                                <TableCell>
+                                    {row.isSub
+                                        ?
+                                            <IconButton
+                                                onClick={() => handleDelSub(row.configId)}
+                                                color={"success"}
+                                                size="small"
+                                            >
+                                                <CheckIcon />
+                                            </IconButton>
+                                        :
+                                            <IconButton
+                                                onClick={() => handleAddSub(row.configId)}
+                                                color={"default"}
+                                                size="small"
+                                            >
+                                                <AddIcon />
+                                            </IconButton>
                                     }
                                 </TableCell>
                             </TableRow>

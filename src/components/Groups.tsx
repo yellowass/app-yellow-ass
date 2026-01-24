@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import {
     Card,
     CardContent,
@@ -14,13 +14,32 @@ import { useNavigate } from 'react-router-dom'
 function Groups() {
     const navigate = useNavigate()
 
-    const appTree = useContext(AppTreeContext)
-
-    const groups = Object.keys(appTree).map(groupId => ({ id: groupId, name: appTree[Number(groupId)].groupName }))
+    const app = useContext(AppTreeContext)
+    const { appSettings } = app
+    const [groups, setGroups] = useState<{ id: string, name: string, status: "no" | "request" | "file" }[]>([])
 
     const handleClick = (groupId: string) => {
         navigate(`/configs/${groupId}`)
     }
+
+    useEffect(() => {
+        const groupsFilter = Object.keys(app.appTree)
+            .map(groupId => ({
+                id: groupId,
+                name: app.appTree[Number(groupId)].groupName,
+                status: app.appTree[Number(groupId)].groupStatus,
+                sub: Object.keys(app.appTree[Number(groupId)].configs).some(configId => appSettings.subscriptions.includes(configId))
+            }))
+            .filter(group => {
+                if (appSettings.filter === 'all') return true
+                if (appSettings.filter === 'file' && group.status !== 'file') return false
+                if (appSettings.filter === 'request' && group.status !== 'request') return false
+                if (appSettings.filter === 'sub' && !group.sub) return false
+                return true
+            })
+        setGroups(groupsFilter)
+        console.log('groups.filter - ', appSettings.filter, 'count', groupsFilter.length)
+    }, [app])
 
     return (
         <>
@@ -46,7 +65,7 @@ function Groups() {
                             </Typography>
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <Chip
-                                    label={`${Object.keys(appTree[Number(g.id)].configs).length} элементов`}
+                                    label={`${Object.keys(app.appTree[Number(g.id)].configs).length} элементов`}
                                     size="small"
                                     color="primary"
                                     variant="outlined"

@@ -4,27 +4,15 @@ import moment from "moment/moment";
 import {
     Typography,
     Box,
-    Button,
-    Rating,
-    Chip,
     Divider,
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
-    CircularProgress,
     Grid,
-    Card,
-    CardMedia, Tooltip, IconButton
+    Tooltip,
+    IconButton
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-import AssignmentReturnIcon from '@mui/icons-material/AssignmentReturn';
-import ShieldIcon from '@mui/icons-material/Shield';
 import {AppTreeContext} from "../App";
-import {IAppTree, IAppTreeConfig, IAppTreeFile, IAppTreeVersion} from "../types/tree";
+import { IAppTreeConfig, IAppTreeFile, IAppTreeVersion } from "../types/tree";
 import CheckIcon from "@mui/icons-material/Check";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
@@ -34,11 +22,11 @@ const Files = () => {
     const { versionId } = useParams()
     const navigate = useNavigate()
 
-    const appTree: IAppTree = useContext(AppTreeContext)
+    const app = useContext(AppTreeContext)
 
     const files: IAppTreeFile[] = []
     let currentVersion: IAppTreeVersion = {} as IAppTreeVersion
-    for (const group of Object.values(appTree)) {
+    for (const group of Object.values(app.appTree)) {
         const configs: IAppTreeConfig = group.configs
         for (const config of Object.values(configs)) {
             const versions: IAppTreeVersion[] = config.versions
