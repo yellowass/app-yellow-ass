@@ -23,7 +23,16 @@ interface IAppTreeConfig {
     }
 }
 
+interface ISubscriptions {
+    configId: number
+    value: boolean
+    isChange: boolean
+}
+
 interface IAppTree {
+    filter: string
+    subscriptions: ISubscriptions[]
+    requestVersions: number[]
     [key: number]: {
         groupName: string
         configs: IAppTreeConfig
@@ -34,5 +43,6 @@ export type {
     IAppTreeFile,
     IAppTreeVersion,
     IAppTreeConfig,
-    IAppTree
+    IAppTree,
+    ISubscriptions
 }

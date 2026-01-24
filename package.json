@@ -17,6 +17,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@types/react-router-dom": "^5.3.3",
+    "@types/telegram-web-app": "^7.10.1",
     "moment": "^2.30.1",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
