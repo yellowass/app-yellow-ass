@@ -1,9 +1,13 @@
-import React, {createContext, ReactNode, useContext, useState} from 'react'
-import { BrowserRouter as Router, Routes, Route, HashRouter } from 'react-router-dom'
+import React, { createContext, ReactNode, useContext, useState } from 'react'
+import {
+    Routes,
+    Route,
+    HashRouter
+} from 'react-router-dom'
 import { CssBaseline } from '@mui/material'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 
-import {IAppTree, TFilter} from './types/tree'
+import { IAppTree, TFilter } from './types/tree'
 import Configurations from './components/Configurations'
 import Groups from './components/Groups'
 import Layout from './components/Layout'
@@ -56,7 +60,7 @@ export const AppTreeProvider: React.FC<AppTreeProviderProps> = ({ children }) =>
 
     const [appSettings, setAppSettings] = useState<IAppSettings>({
         filter: 'file',
-        subscriptions: ['886', '91'],
+        subscriptions: [],
         requests: []
     })
 

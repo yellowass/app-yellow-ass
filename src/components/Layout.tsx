@@ -1,6 +1,5 @@
-import React, {ReactNode, useCallback, useContext, useEffect, useState} from 'react'
+import React, { ReactNode, useCallback, useContext, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { useTelegram } from '../hooks/useTelegram'
 import {
     Container,
     AppBar,
@@ -11,12 +10,15 @@ import {
     FormControl,
     InputLabel,
     Select,
-    MenuItem, SelectChangeEvent
+    MenuItem,
+    SelectChangeEvent
 } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { useNavigate } from 'react-router-dom'
-import {AppTreeContext} from "../App";
-import {ISubscriptions, TFilter} from "../types/tree";
+
+import { useTelegram } from '../hooks/useTelegram'
+import { AppTreeContext } from '../App'
+import { TFilter } from '../types/tree'
 
 const Layout = ({ children }: { children: ReactNode }) => {
     const { tg, queryId, user, chat} = useTelegram()
@@ -58,11 +60,6 @@ const Layout = ({ children }: { children: ReactNode }) => {
         })
         tg.MainButton.show()
     }, [])
-
-    useEffect(() => {
-        console.log('subscriptions - ', appSettings.subscriptions)
-        console.log('requestVersions - ', appSettings.requests)
-    }, [appSettings.subscriptions, appSettings.requests])
 
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>

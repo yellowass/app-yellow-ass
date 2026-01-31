@@ -1,4 +1,5 @@
-import React, {useContext, useEffect, useState} from 'react'
+import React, { useContext, useEffect, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
     Card,
     CardContent,
@@ -9,13 +10,17 @@ import {
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 
 import { AppTreeContext } from '../App'
-import { useNavigate } from 'react-router-dom'
 
 function Groups() {
     const navigate = useNavigate()
 
+    const [search, setSearch] = useSearchParams()
+
+    const userSubscriptions = search.get('sub')
+    const userRequests = search.get('req')
+
     const app = useContext(AppTreeContext)
-    const { appSettings } = app
+    const { appSettings, updateSubscriptions, updateRequests } = app
     const [groups, setGroups] = useState<{ id: string, name: string, status: "no" | "request" | "file" }[]>([])
 
     const handleClick = (groupId: string) => {
@@ -38,13 +43,27 @@ function Groups() {
                 return true
             })
         setGroups(groupsFilter)
-        console.log('groups.filter - ', appSettings.filter, 'count', groupsFilter.length)
     }, [app])
+
+    useEffect(() => {
+        updateSubscriptions(userSubscriptions ? userSubscriptions.split(',') : [])
+        if (userRequests) {
+            const temp = userRequests.split(',').map((i: string) => {
+                return {
+                    id: Number(i),
+                    oldValue: true,
+                    newValue: false
+                }
+            })
+            updateRequests(temp)
+        }
+    }, [])
 
     return (
         <>
             {groups.map((g: { id: string, name: string }) => (
                 <Card
+                    key={g.id}
                     sx={{
                         mb: 2,
                         borderRadius: 2,
