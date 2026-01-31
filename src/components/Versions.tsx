@@ -21,7 +21,7 @@ const Versions: FC = () => {
     const navigate = useNavigate()
 
     const app = useContext(AppTreeContext)
-    const { appTree, appSettings } = app
+    const { appTree, appSettings, updateRequests } = app
 
     const config = Object.values(appTree).filter(g => g.configs[Number(configId)])[0].configs[Number(configId)]
     const versions: IAppTreeVersion[] = config.versions
@@ -35,8 +35,28 @@ const Versions: FC = () => {
         if (files && files.length) navigate(`/files/${versionId}`)
     }
 
+    const handleRequestClick = (versionId: number) => {
+        const currentRequest = [...appSettings.requests]
+        if (currentRequest.find(i => i.id === versionId)) {
+            currentRequest.forEach(i => {
+                if (i.id === versionId) {
+                    i.newValue = !i.newValue
+                }
+            })
+        } else {
+            currentRequest.push(
+                {
+                    id: versionId,
+                    oldValue: false,
+                    newValue: true
+                }
+            )
+        }
+        updateRequests(currentRequest)
+    }
+
     const getStatusColor = (status: string, versionId: number): { label: string, color: 'error' | 'warning' | 'success' } => {
-        if (appSettings.requests.find(r => r.id === versionId)) return { label: 'уже запрошен', color: 'error' }
+        if (appSettings.requests.filter(r => r.id === versionId)[0]?.newValue) return { label: 'уже запрошен', color: 'error' }
         if (status === 'not available') return { label: 'нет', color: 'error' }
         if (status === 'request') return { label: 'по запросу', color: 'warning' }
         return { label: 'есть', color: 'success' }
@@ -71,9 +91,15 @@ const Versions: FC = () => {
                                 <TableCell>{row.versionName}</TableCell>
                                 <TableCell sx={{ color: isFresh(row.versionDate) }}>{row.versionDate ? moment(row.versionDate).format('DD.MM.YYYY') : '-'}</TableCell>
                                 <TableCell>
-                                    {getStatusColor(row.versionStatus, row.versionId).label === 'по запросу'
+                                    {['уже запрошен', 'по запросу'].includes(getStatusColor(row.versionStatus, row.versionId).label)
                                         ?
-                                            <Button variant="outlined" color={'warning'}>запросить</Button>
+                                            <Button
+                                                variant="outlined"
+                                                color={getStatusColor(row.versionStatus, row.versionId).color}
+                                                onClick={() => handleRequestClick(row.versionId)}
+                                            >
+                                                {getStatusColor(row.versionStatus, row.versionId).label}
+                                            </Button>
                                         :
                                             <Chip
                                                 label={getStatusColor(row.versionStatus, row.versionId).label}

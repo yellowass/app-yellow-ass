@@ -24,9 +24,6 @@ const Layout = ({ children }: { children: ReactNode }) => {
     const app = useContext(AppTreeContext)
     const { appTree, appSettings, updateFilter } = app;
 
-    const [subscriptions, setSubscriptions] = useState<ISubscriptions[]>([])
-    const [requestVersions, setRequestVersions] = useState<number[]>([])
-
     const navigate = useNavigate()
     const location = useLocation()
 
@@ -42,11 +39,11 @@ const Layout = ({ children }: { children: ReactNode }) => {
         tg.sendData(JSON.stringify({
             type: 'setData',
             data: {
-                subscriptions,
-                requestVersions
+                subscriptions: appSettings.subscriptions,
+                requestVersions: appSettings.requests
             },
         }));
-    }, [subscriptions, requestVersions])
+    }, [appSettings.subscriptions, appSettings.requests])
 
     useEffect(() => {
         tg.onEvent('mainButtonClicked', onSendData)
@@ -59,11 +56,13 @@ const Layout = ({ children }: { children: ReactNode }) => {
         tg.MainButton.setParams({
             text: 'Отправить данные'
         })
+        tg.MainButton.show()
     }, [])
 
     useEffect(() => {
-        console.log('appTree.filter - ', appSettings.filter)
-    }, [appSettings.filter])
+        console.log('subscriptions - ', appSettings.subscriptions)
+        console.log('requestVersions - ', appSettings.requests)
+    }, [appSettings.subscriptions, appSettings.requests])
 
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
